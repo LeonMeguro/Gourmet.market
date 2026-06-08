@@ -1,0 +1,1389 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Gourmet Market | Toko Makanan Online</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <style>
+    :root {
+      --primary: #16a34a;
+      --primary-2: #0f766e;
+      --bg: #f6f8fb;
+      --card: #ffffff;
+      --text: #0f172a;
+      --muted: #64748b;
+      --border: #e2e8f0;
+      --shadow: 0 12px 35px rgba(15,23,42,.08);
+      --radius: 18px;
+    }
+    * { box-sizing: border-box; }
+    html, body { margin: 0; padding: 0; font-family: Inter, sans-serif; background: var(--bg); color: var(--text); }
+    button, input, select, textarea { font: inherit; }
+    a { color: inherit; text-decoration: none; }
+
+    .topbar {
+      position: sticky; top: 0; z-index: 40;
+      background: rgba(255,255,255,.92);
+      backdrop-filter: blur(10px);
+      border-bottom: 1px solid var(--border);
+    }
+    .wrap { max-width: 1300px; margin: 0 auto; padding: 0 18px; }
+    .nav {
+      display:flex; align-items:center; gap: 14px; padding: 14px 0;
+    }
+    .logo {
+      display:flex; align-items:center; gap: 10px; font-weight: 800;
+      color: var(--primary); white-space: nowrap; font-size: 1.12rem;
+    }
+    .search {
+      flex: 1; position: relative;
+    }
+    .search input {
+      width: 100%; padding: 14px 16px 14px 46px; border: 1px solid var(--border);
+      border-radius: 14px; background: #fff; outline: none;
+      transition: .2s ease;
+    }
+    .search input:focus {
+      border-color: rgba(22,163,74,.6);
+      box-shadow: 0 0 0 4px rgba(22,163,74,.12);
+    }
+    .search i { position:absolute; left: 16px; top: 50%; transform: translateY(-50%); color: var(--muted); }
+    .cart-btn {
+      position: relative; border: 1px solid var(--border); background: white; border-radius: 14px;
+      padding: 12px 14px; cursor: pointer; box-shadow: 0 6px 20px rgba(15,23,42,.04);
+    }
+    .cart-badge {
+      position:absolute; top:-8px; right:-8px; min-width: 22px; height: 22px; border-radius: 999px;
+      background: #ef4444; color:#fff; display:flex; align-items:center; justify-content:center;
+      font-size: .75rem; font-weight: 800; padding: 0 6px;
+    }
+
+    .hero {
+      padding: 22px 0 6px;
+    }
+    .hero-card {
+      background: linear-gradient(135deg, rgba(22,163,74,.12), rgba(15,118,110,.12));
+      border: 1px solid rgba(22,163,74,.15);
+      border-radius: 24px;
+      padding: 22px;
+      box-shadow: var(--shadow);
+      display: grid;
+      grid-template-columns: 1.7fr .8fr;
+      gap: 16px;
+      align-items: center;
+    }
+    .hero h1 { margin: 0 0 8px; font-size: clamp(1.4rem, 2.2vw, 2.3rem); }
+    .hero p { margin: 0; color: var(--muted); line-height: 1.6; }
+    .hero-stats {
+      display:grid; grid-template-columns: repeat(3, 1fr); gap: 10px;
+    }
+    .stat {
+      background: rgba(255,255,255,.85); border: 1px solid var(--border);
+      border-radius: 18px; padding: 14px; text-align:center;
+    }
+    .stat strong { display:block; font-size: 1.2rem; }
+    .stat span { color: var(--muted); font-size: .88rem; }
+
+    .layout {
+      display:grid; grid-template-columns: 280px 1fr; gap: 22px; padding: 18px 0 30px;
+    }
+    .panel, .sidebar, .product-card, .drawer, .modal {
+      border: 1px solid var(--border); background: var(--card); border-radius: var(--radius);
+      box-shadow: var(--shadow);
+    }
+    .sidebar {
+      padding: 18px;
+      height: fit-content;
+      position: sticky;
+      top: 86px;
+    }
+    .section-title {
+      font-size: .92rem; font-weight: 800; margin: 0 0 12px; letter-spacing: .2px;
+    }
+    .chip-list {
+      display:flex; flex-wrap: wrap; gap: 10px;
+    }
+    .chip {
+      border: 1px solid var(--border); background: white; color: var(--text);
+      padding: 10px 12px; border-radius: 999px; cursor: pointer; transition: .18s ease;
+      font-weight: 600; font-size: .9rem;
+    }
+    .chip.active, .chip:hover {
+      background: rgba(22,163,74,.11); border-color: rgba(22,163,74,.35); color: var(--primary);
+    }
+    .select, .mini-input {
+      width:100%; border: 1px solid var(--border); border-radius: 12px; background: white;
+      padding: 11px 12px; outline: none;
+    }
+    .group { margin-top: 18px; }
+
+    .main {
+      min-width: 0;
+    }
+    .toolbar {
+      display:flex; justify-content: space-between; gap: 12px; align-items: center; margin-bottom: 14px;
+      flex-wrap: wrap;
+    }
+    .toolbar h2 { margin: 0; font-size: 1.2rem; }
+    .meta { color: var(--muted); font-size: .92rem; }
+    .sort-wrap { min-width: 220px; }
+
+    .grid {
+      display:grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 16px;
+    }
+    .product-card {
+      overflow: hidden;
+      display:flex; flex-direction: column;
+      position: relative;
+      transition: transform .2s ease, box-shadow .2s ease, border-color .2s ease;
+    }
+    .product-card:hover {
+      transform: translateY(-4px);
+      border-color: rgba(22,163,74,.3);
+    }
+    .product-image {
+      aspect-ratio: 4 / 3;
+      width:100%;
+      object-fit: cover;
+      display:block;
+      background: #e2e8f0;
+    }
+    .badge {
+      position:absolute; top: 12px; left: 12px;
+      background: #f59e0b; color: white; font-size: .74rem; font-weight: 800;
+      padding: 6px 9px; border-radius: 999px;
+    }
+    .product-body { padding: 14px; display:flex; flex-direction: column; gap: 8px; flex:1; }
+    .category { color: var(--primary-2); font-size: .78rem; text-transform: uppercase; font-weight: 800; letter-spacing: .7px; }
+    .name { margin:0; font-size: 1rem; line-height: 1.35; min-height: 2.7em; }
+    .desc { margin:0; color: var(--muted); font-size: .9rem; line-height: 1.5; min-height: 2.8em; }
+    .price-row { display:flex; justify-content: space-between; align-items: end; gap: 8px; margin-top: auto; }
+    .price { font-size: 1.05rem; font-weight: 800; }
+    .btn {
+      border: 0; cursor:pointer; border-radius: 12px; padding: 11px 14px; font-weight: 700;
+      transition: .18s ease;
+    }
+    .btn-primary { background: var(--primary); color: white; }
+    .btn-primary:hover { filter: brightness(.95); }
+    .btn-ghost { background: #eef2f7; color: var(--text); }
+    .btn-ghost:hover { background: #e2e8f0; }
+    .btn-danger { background: #fee2e2; color: #b91c1c; }
+    .btn-danger:hover { background: #fecaca; }
+    .small { font-size: .88rem; }
+
+    .empty {
+      grid-column: 1 / -1;
+      text-align: center;
+      padding: 42px 16px;
+      color: var(--muted);
+      background: white;
+      border: 1px dashed var(--border);
+      border-radius: 18px;
+    }
+
+    .overlay {
+      position: fixed; inset: 0; background: rgba(15,23,42,.48); z-index: 60;
+      opacity: 0; pointer-events:none; transition: .2s ease;
+    }
+    .overlay.show { opacity: 1; pointer-events:auto; }
+
+    .drawer {
+      position: fixed; top: 0; right: -430px; width: min(430px, 100vw); height: 100vh;
+      z-index: 70; transition: right .24s ease;
+      display:flex; flex-direction: column;
+      border-radius: 0; border-left: 1px solid var(--border);
+    }
+    .drawer.open { right: 0; }
+    .drawer-head, .drawer-foot {
+      padding: 18px; border-bottom: 1px solid var(--border);
+    }
+    .drawer-head {
+      display:flex; justify-content: space-between; align-items: center;
+    }
+    .drawer-body {
+      padding: 16px 18px; overflow:auto; flex:1;
+    }
+    .cart-item {
+      display:grid; grid-template-columns: 68px 1fr; gap: 12px;
+      padding: 12px 0; border-bottom: 1px solid var(--border);
+    }
+    .cart-item img {
+      width: 68px; height: 68px; object-fit: cover; border-radius: 14px; background: #eef2f7;
+    }
+    .cart-item h4 { margin: 0 0 6px; font-size: .96rem; }
+    .cart-item .sub { color: var(--muted); font-size: .88rem; margin-bottom: 8px; }
+    .qty {
+      display:flex; align-items:center; justify-content: space-between; gap: 10px;
+    }
+    .qty-control {
+      display:flex; align-items:center; gap: 8px;
+    }
+    .qty-btn {
+      width: 30px; height: 30px; border: 1px solid var(--border); background: white;
+      border-radius: 10px; cursor:pointer; font-weight: 900;
+    }
+    .total-box {
+      display:flex; justify-content: space-between; align-items:center; margin-bottom: 14px; font-weight: 800;
+    }
+    .drawer-actions {
+      display:grid; grid-template-columns: 1fr 1fr; gap: 10px;
+    }
+
+    .modal-wrap {
+      position: fixed; inset: 0; z-index: 80; display:none;
+      align-items:center; justify-content:center; padding: 16px;
+      background: rgba(15,23,42,.48);
+    }
+    .modal-wrap.show { display:flex; }
+    .modal {
+      width: min(700px, 100%);
+      max-height: 92vh; overflow:auto;
+      padding: 18px;
+    }
+    .modal-head {
+      display:flex; justify-content: space-between; align-items:center; margin-bottom: 14px;
+    }
+    .form-grid {
+      display:grid; grid-template-columns: repeat(2, 1fr); gap: 12px;
+    }
+    .field { display:flex; flex-direction: column; gap: 7px; }
+    .field label { font-size: .9rem; font-weight: 700; }
+    .field.full { grid-column: 1 / -1; }
+    .summary {
+      margin-top: 14px;
+      background: #f8fafc;
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 14px;
+    }
+    .summary-row {
+      display:flex; justify-content: space-between; gap: 12px; margin-bottom: 8px; color: var(--text);
+    }
+    .summary-row:last-child { margin-bottom: 0; }
+    .summary-row strong { font-size: 1.05rem; }
+    .pay-methods {
+      display:grid; gap: 10px;
+    }
+    .pay-option {
+      display:flex; align-items:center; gap: 10px;
+      padding: 11px 12px; border: 1px solid var(--border); border-radius: 14px;
+      background: white;
+    }
+    .toast {
+      position: fixed; left: 50%; bottom: 22px; transform: translateX(-50%) translateY(20px);
+      background: #0f172a; color: white; padding: 12px 14px; border-radius: 12px;
+      opacity: 0; pointer-events:none; transition: .22s ease; z-index: 120;
+      box-shadow: var(--shadow); max-width: min(92vw, 420px);
+    }
+    .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+
+    @media (max-width: 980px) {
+      .layout { grid-template-columns: 1fr; }
+      .sidebar { position: static; }
+      .hero-card { grid-template-columns: 1fr; }
+    }
+    @media (max-width: 640px) {
+      .nav { flex-wrap: wrap; }
+      .search { order: 3; flex-basis: 100%; }
+      .hero-stats, .form-grid, .drawer-actions { grid-template-columns: 1fr; }
+      .toolbar { align-items: stretch; }
+      .sort-wrap { min-width: 100%; }
+    }
+  </style>
+
+<style>
+.login-screen{position:fixed;inset:0;background:linear-gradient(135deg,#0f172a,#1e293b);z-index:9999;display:flex;align-items:center;justify-content:center}
+.login-box{background:#fff;padding:30px;border-radius:20px;width:min(400px,90vw);box-shadow:0 20px 50px rgba(0,0,0,.3)}
+.login-box h2{text-align:center;margin-bottom:20px}
+.login-box input{width:100%;padding:12px;margin:8px 0;border:1px solid #ddd;border-radius:10px}
+.login-box button{width:100%;padding:12px;border:none;background:#16a34a;color:#fff;border-radius:10px;font-weight:bold;cursor:pointer}
+.login-error{color:red;font-size:.9rem;margin-top:10px;text-align:center}
+</style>
+</head>
+<body>
+<div class="login-screen" id="loginScreen">
+<div class="login-box">
+<h2>Login Gourmet Market</h2>
+<input type="text" id="loginUser" placeholder="Username">
+<input type="password" id="loginPass" placeholder="Password">
+<button onclick="loginSystem()">Masuk</button>
+<div class="login-error" id="loginError"></div>
+</div>
+</div>
+
+  <header class="topbar">
+    <div class="wrap">
+      <div class="nav">
+        <a class="logo" href="#"><i class="fa-solid fa-basket-shopping"></i><span>Gourmet Market</span></a>
+        <div class="search">
+          <i class="fa-solid fa-magnifying-glass"></i>
+          <input id="searchInput" type="search" placeholder="Cari produk, kategori, atau kata kunci...">
+        </div>
+        <button class="cart-btn" id="cartBtn" aria-label="Buka keranjang">
+          <i class="fa-solid fa-cart-shopping"></i>
+          <span class="cart-badge" id="cartCount">0</span>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <main class="wrap">
+    <section class="hero">
+      <div class="hero-card">
+        <div>
+          <h1>Toko makanan online yang lebih rapi, lebih cepat, dan tidak jatuh berantakan seperti UI asal jadi.</h1>
+          <p>Cari produk, filter kategori, simpan keranjang, lalu bayar lewat modal checkout yang beneran ada fungsinya. Data keranjang juga disimpan di browser.</p>
+        </div>
+        <div class="hero-stats">
+          <div class="stat"><strong id="statProducts">50</strong><span>Produk</span></div>
+          <div class="stat"><strong id="statCategories">7</strong><span>Kategori</span></div>
+          <div class="stat"><strong id="statCart">0</strong><span>Item di keranjang</span></div>
+        </div>
+      </div>
+    </section>
+
+    <section class="layout">
+      <aside class="sidebar">
+        <h3 class="section-title">Filter kategori</h3>
+        <div class="chip-list" id="categoryChips"></div>
+
+        <div class="group">
+          <h3 class="section-title">Urutkan</h3>
+          <select class="select" id="sortSelect">
+            <option value="featured">Paling relevan</option>
+            <option value="low-high">Harga: rendah ke tinggi</option>
+            <option value="high-low">Harga: tinggi ke rendah</option>
+            <option value="name-az">Nama: A-Z</option>
+          </select>
+        </div>
+
+        <div class="group">
+          <h3 class="section-title">Aksi cepat</h3>
+          <button class="btn btn-ghost small" id="resetFilters" style="width:100%; margin-bottom:10px;"><i class="fa-solid fa-rotate-left"></i> Reset filter</button>
+          <button class="btn btn-danger small" id="clearStorage" style="width:100%;"><i class="fa-solid fa-trash"></i> Hapus keranjang tersimpan</button>
+        </div>
+      </aside>
+
+      <section class="main">
+        <div class="toolbar">
+          <div>
+            <h2 id="viewTitle">Semua Produk</h2>
+            <div class="meta" id="resultInfo">Memuat produk...</div>
+          </div>
+          <div class="meta" id="hintInfo">Pencarian membaca nama, kategori, deskripsi, dan tag.</div>
+        </div>
+        <div class="grid" id="productGrid"></div>
+      </section>
+    </section>
+  </main>
+
+  <div class="overlay" id="overlay"></div>
+
+  <aside class="drawer" id="cartDrawer" aria-hidden="true">
+    <div class="drawer-head">
+      <div>
+        <h3 style="margin:0;">Keranjang</h3>
+        <div class="meta" id="cartMeta">0 item</div>
+      </div>
+      <button class="btn btn-ghost" id="closeCart"><i class="fa-solid fa-xmark"></i></button>
+    </div>
+    <div class="drawer-body" id="cartList"></div>
+    <div class="drawer-foot">
+      <div class="total-box"><span>Subtotal</span><span id="subtotal">Rp 0</span></div>
+      <div class="total-box"><span>Ongkir</span><span id="shipping">Rp 0</span></div>
+      <div class="total-box" style="padding-top:8px; border-top:1px solid var(--border);"><span>Total</span><span id="grandTotal">Rp 0</span></div>
+      <div class="drawer-actions" style="margin-top:14px;">
+        <button class="btn btn-ghost" id="continueShopping">Lanjut belanja</button>
+        <button class="btn btn-primary" id="checkoutBtn">Bayar sekarang</button>
+      </div>
+    </div>
+  </aside>
+
+  <div class="modal-wrap" id="checkoutModal">
+    <div class="modal">
+      <div class="modal-head">
+        <div>
+          <h3 style="margin:0;">Checkout</h3>
+          <div class="meta">Isi data pembayaran secukupnya. Manusia suka bikin proses sederhana jadi ritual administratif.</div>
+        </div>
+        <button class="btn btn-ghost" id="closeCheckout"><i class="fa-solid fa-xmark"></i></button>
+      </div>
+
+      <div class="form-grid">
+        <div class="field">
+          <label for="buyerName">Nama penerima</label>
+          <input class="mini-input" id="buyerName" placeholder="Nama lengkap">
+        </div>
+        <div class="field">
+          <label for="phoneNumber">Nomor HP</label>
+          <input class="mini-input" id="phoneNumber" placeholder="08xxxxxxxxxx">
+        </div>
+        <div class="field full">
+          <label for="address">Alamat pengiriman</label>
+          <textarea class="mini-input" id="address" rows="3" placeholder="Tulis alamat lengkap"></textarea>
+        </div>
+        <div class="field">
+          <label for="delivery">Metode pengiriman</label>
+          <select class="select" id="delivery">
+            <option value="reguler">Reguler</option>
+            <option value="express">Express</option>
+            <option value="pickup">Ambil di tempat</option>
+          </select>
+        </div>
+        <div class="field">
+          <label for="paymentMethod">Metode pembayaran</label>
+          <select class="select" id="paymentMethod">
+            <option value="transfer">Transfer bank</option>
+            <option value="ewallet">E-Wallet</option>
+            <option value="cod">COD</option>
+          </select>
+        </div>
+        <div class="field full">
+          <label>Ringkasan pembayaran</label>
+          <div class="summary">
+            <div class="summary-row"><span>Subtotal</span><span id="modalSubtotal">Rp 0</span></div>
+            <div class="summary-row"><span>Ongkir</span><span id="modalShipping">Rp 0</span></div>
+            <div class="summary-row"><strong>Total</strong><strong id="modalTotal">Rp 0</strong></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="field full" style="margin-top:14px;">
+        <button class="btn btn-primary" id="confirmPayment" style="width:100%;">Konfirmasi pembayaran</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="toast" id="toast"></div>
+
+  <script>
+    const products = [
+      {
+            "id": 1,
+            "name": "Apel Fuji Fresh Pack",
+            "category": "Buah",
+            "price": 32000,
+            "promo": true,
+            "description": "Apel manis, renyah, cocok buat stok harian.",
+            "tags": "apel fresh sehat",
+            "image": "https://images.unsplash.com/photo-1567306226416-28f0efdc88ce?auto=format&fit=crop&w=800&q=80"
+      },
+      {
+            "id": 2,
+            "name": "Pisang Cavendish Premium",
+            "category": "Buah",
+            "price": 28000,
+            "promo": false,
+            "description": "Pisang lembut untuk sarapan atau smoothie.",
+            "tags": "pisang sarapan",
+            "image": "https://images.unsplash.com/photo-1570913149827-d2ac84ab3f9a?auto=format&fit=crop&w=800&q=80"
+      },
+      {
+            "id": 3,
+            "name": "Anggur Merah Seedless",
+            "category": "Buah",
+            "price": 54000,
+            "promo": true,
+            "description": "Anggur segar tanpa biji, manis dan juicy.",
+            "tags": "anggur buah",
+            "image": "https://images.unsplash.com/photo-1547592180-85f173990554?auto=format&fit=crop&w=800&q=80"
+      },
+      {
+            "id": 4,
+            "name": "Jeruk Sunkist Import",
+            "category": "Buah",
+            "price": 47000,
+            "promo": false,
+            "description": "Jeruk segar tinggi vitamin C.",
+            "tags": "jeruk vitamin",
+            "image": "https://images.unsplash.com/photo-1610832958506-aa56368176cf?auto=format&fit=crop&w=800&q=80"
+      },
+      {
+            "id": 5,
+            "name": "Kiwi Hijau New Zealand",
+            "category": "Buah",
+            "price": 58000,
+            "promo": false,
+            "description": "Kiwi asam-manis dengan tekstur lembut.",
+            "tags": "kiwi import",
+            "image": "https://images.unsplash.com/photo-1569349935955-0b6f2f2f5f3d?auto=format&fit=crop&w=800&q=80"
+      },
+      {
+            "id": 6,
+            "name": "Semangka Mini Sweet",
+            "category": "Buah",
+            "price": 39000,
+            "promo": false,
+            "description": "Semangka kecil, praktis, dan segar.",
+            "tags": "semangka buah",
+            "image": "https://images.unsplash.com/photo-1619566636858-adf3ef46400b?auto=format&fit=crop&w=800&q=80"
+      },
+      {
+            "id": 7,
+            "name": "Melon Hijau Manis",
+            "category": "Buah",
+            "price": 45000,
+            "promo": true,
+            "description": "Melon harum untuk pencuci mulut.",
+            "tags": "melon manis",
+            "image": "https://images.unsplash.com/photo-1610832958506-aa56368176cf?auto=format&fit=crop&w=800&q=80"
+      },
+      {
+            "id": 8,
+            "name": "Stroberi Fresh Box",
+            "category": "Buah",
+            "price": 62000,
+            "promo": true,
+            "description": "Stroberi pilihan untuk dessert dan topping.",
+            "tags": "stroberi box",
+            "image": "https://images.unsplash.com/photo-1563746098251-df5d90b1f7b4?auto=format&fit=crop&w=800&q=80"
+      },
+      {
+            "id": 9,
+            "name": "Croissant Butter Original",
+            "category": "Roti & Kue",
+            "price": 22000,
+            "promo": false,
+            "description": "Croissant renyah berlapis butter.",
+            "tags": "croissant bakery",
+            "image": "https://images.unsplash.com/photo-1509440159596-0249088772ff?auto=format&fit=crop&w=800&q=80"
+      },
+      {
+            "id": 10,
+            "name": "Roti Sobek Cokelat",
+            "category": "Roti & Kue",
+            "price": 26000,
+            "promo": false,
+            "description": "Roti lembut isi cokelat lumer.",
+            "tags": "roti cokelat",
+            "image": "https://images.unsplash.com/photo-1555507036-ab1f4038808a?auto=format&fit=crop&w=800&q=80"
+      },
+      {
+            "id": 11,
+            "name": "Donat Gula Klasik",
+            "category": "Roti & Kue",
+            "price": 18000,
+            "promo": false,
+            "description": "Donat empuk dengan taburan gula halus.",
+            "tags": "donat",
+            "image": "https://images.unsplash.com/photo-1551024506-0bccd828d307?auto=format&fit=crop&w=800&q=80"
+      },
+      {
+            "id": 12,
+            "name": "Red Velvet Slice",
+            "category": "Roti & Kue",
+            "price": 35000,
+            "promo": true,
+            "description": "Slice cake lembut dengan cream cheese.",
+            "tags": "cake red velvet",
+            "image": "https://images.unsplash.com/photo-1499636136210-6f4ee915583e?auto=format&fit=crop&w=800&q=80"
+      },
+      {
+            "id": 13,
+            "name": "Muffin Blueberry",
+            "category": "Roti & Kue",
+            "price": 24000,
+            "promo": false,
+            "description": "Muffin manis dengan isian blueberry.",
+            "tags": "muffin blueberry",
+            "image": "https://images.unsplash.com/photo-1486427944299-d1955d23e34d?auto=format&fit=crop&w=800&q=80"
+      },
+      {
+            "id": 14,
+            "name": "Roti Keju Lumer",
+            "category": "Roti & Kue",
+            "price": 29000,
+            "promo": true,
+            "description": "Roti gurih isi keju melimpah.",
+            "tags": "roti keju",
+            "image": "https://images.unsplash.com/photo-1483695028939-5bb13f8648b0?auto=format&fit=crop&w=800&q=80"
+      },
+      {
+            "id": 15,
+            "name": "Puff Pastry Apple",
+            "category": "Roti & Kue",
+            "price": 31000,
+            "promo": false,
+            "description": "Puff pastry dengan isian apel cinnamon.",
+            "tags": "pastry apel",
+            "image": "https://images.unsplash.com/photo-1509440159596-0249088772ff?auto=format&fit=crop&w=800&q=80"
+      },
+      {
+            "id": 16,
+            "name": "Brownies Fudgy",
+            "category": "Roti & Kue",
+            "price": 33000,
+            "promo": true,
+            "description": "Brownies padat, lembap, dan cokelat banget.",
+            "tags": "brownies",
+            "image": "https://images.unsplash.com/photo-1551024601-bec78aea704b?auto=format&fit=crop&w=800&q=80"
+      },
+      {
+            "id": 17,
+            "name": "Keripik Tempe Krispi",
+            "category": "Camilan",
+            "price": 17000,
+            "promo": false,
+            "description": "Camilan gurih khas rumahan.",
+            "tags": "keripik tempe",
+            "image": "https://images.unsplash.com/photo-1606313564200-e75d5e30476c?auto=format&fit=crop&w=800&q=80"
+      },
+      {
+            "id": 18,
+            "name": "Kentang Mustofa Pedas",
+            "category": "Camilan",
+            "price": 23000,
+            "promo": true,
+            "description": "Kentang renyah dengan rasa pedas manis.",
+            "tags": "kentang mustofa",
+            "image": "https://images.unsplash.com/photo-1585238341986-5b62f0b7e14d?auto=format&fit=crop&w=800&q=80"
+      },
+      {
+            "id": 19,
+            "name": "Kacang Mete Panggang",
+            "category": "Camilan",
+            "price": 49000,
+            "promo": false,
+            "description": "Mete premium panggang, cocok buat ngemil.",
+            "tags": "kacang mete",
+            "image": "https://images.unsplash.com/photo-1621939514649-280e2d7cdbd8?auto=format&fit=crop&w=800&q=80"
+      },
+      {
+            "id": 20,
+            "name": "Popcorn Caramel",
+            "category": "Camilan",
+            "price": 21000,
+            "promo": false,
+            "description": "Popcorn manis gurih untuk santai.",
+            "tags": "popcorn",
+            "image": "https://images.unsplash.com/photo-1504674900247-0877df9cc836?auto=format&fit=crop&w=800&q=80"
+      },
+      {
+            "id": 21,
+            "name": "Biskuit Gandum Sehat",
+            "category": "Camilan",
+            "price": 25000,
+            "promo": false,
+            "description": "Biskuit ringan untuk camilan sehat.",
+            "tags": "biskuit gandum",
+            "image": "https://images.unsplash.com/photo-1514516345957-556ca7d90a5f?auto=format&fit=crop&w=800&q=80"
+      },
+      {
+            "id": 22,
+            "name": "Chili Garlic Crunch",
+            "category": "Camilan",
+            "price": 28000,
+            "promo": true,
+            "description": "Sambal crunch gurih pedas yang nagih.",
+            "tags": "crunch pedas",
+            "image": "https://images.unsplash.com/photo-1599490659213-e2b9527bd087?auto=format&fit=crop&w=800&q=80"
+      },
+      {
+            "id": 23,
+            "name": "Edamame Panggang",
+            "category": "Camilan",
+            "price": 27000,
+            "promo": false,
+            "description": "Camilan tinggi protein, gurih dan ringan.",
+            "tags": "edamame",
+            "image": "https://images.unsplash.com/photo-1513104890138-7c749659a591?auto=format&fit=crop&w=800&q=80"
+      },
+      {
+            "id": 24,
+            "name": "Kerupuk Ikan Renyah",
+            "category": "Camilan",
+            "price": 16000,
+            "promo": false,
+            "description": "Kerupuk renyah cocok untuk lauk.",
+            "tags": "kerupuk ikan",
+            "image": "https://images.unsplash.com/photo-1566478989037-eec170784d0b?auto=format&fit=crop&w=800&q=80"
+      },
+      {
+            "id": 25,
+            "name": "Matcha Latte Botol",
+            "category": "Minuman",
+            "price": 38000,
+            "promo": false,
+            "description": "Matcha creamy dengan rasa lembut.",
+            "tags": "matcha latte",
+            "image": "https://images.unsplash.com/photo-1517701550927-30cf4ba1dba5?auto=format&fit=crop&w=800&q=80"
+      },
+      {
+            "id": 26,
+            "name": "Cold Brew Kopi",
+            "category": "Minuman",
+            "price": 33000,
+            "promo": true,
+            "description": "Kopi dingin dengan rasa bersih dan kuat.",
+            "tags": "kopi cold brew",
+            "image": "https://images.unsplash.com/photo-1544145945-f90425340c7e?auto=format&fit=crop&w=800&q=80"
+      },
+      {
+            "id": 27,
+            "name": "Susu Kurma Sehat",
+            "category": "Minuman",
+            "price": 29000,
+            "promo": false,
+            "description": "Perpaduan susu dan kurma yang manis alami.",
+            "tags": "susu kurma",
+            "image": "https://images.unsplash.com/photo-1514432324607-a09d9b4aefdd?auto=format&fit=crop&w=800&q=80"
+      },
+      {
+            "id": 28,
+            "name": "Jus Mangga Segar",
+            "category": "Minuman",
+            "price": 24000,
+            "promo": false,
+            "description": "Jus buah segar tanpa ribet.",
+            "tags": "jus mangga",
+            "image": "https://images.unsplash.com/photo-1551024709-8f23befc6b7d?auto=format&fit=crop&w=800&q=80"
+      },
+      {
+            "id": 29,
+            "name": "Es Teh Lemon",
+            "category": "Minuman",
+            "price": 20000,
+            "promo": false,
+            "description": "Teh lemon segar untuk siang panas.",
+            "tags": "teh lemon",
+            "image": "https://images.unsplash.com/photo-1437419764061-2473afe69fc2?auto=format&fit=crop&w=800&q=80"
+      },
+      {
+            "id": 30,
+            "name": "Yogurt Drink Strawberry",
+            "category": "Minuman",
+            "price": 30000,
+            "promo": true,
+            "description": "Minuman asam manis yang creamy.",
+            "tags": "yogurt drink",
+            "image": "https://images.unsplash.com/photo-1481671703460-040cb8a2d909?auto=format&fit=crop&w=800&q=80"
+      },
+      {
+            "id": 31,
+            "name": "Sparkling Water Lime",
+            "category": "Minuman",
+            "price": 22000,
+            "promo": false,
+            "description": "Air soda ringan dengan aroma lime.",
+            "tags": "sparkling water",
+            "image": "https://images.unsplash.com/photo-1485808191679-5f86510681a2?auto=format&fit=crop&w=800&q=80"
+      },
+      {
+            "id": 32,
+            "name": "Kefir Plain",
+            "category": "Minuman",
+            "price": 35000,
+            "promo": false,
+            "description": "Minuman fermentasi untuk keseharian.",
+            "tags": "kefir",
+            "image": "https://images.unsplash.com/photo-1534353473418-4cfa6c56fd38?auto=format&fit=crop&w=800&q=80"
+      },
+      {
+            "id": 33,
+            "name": "Dumpling Ayam Frozen",
+            "category": "Frozen",
+            "price": 45000,
+            "promo": true,
+            "description": "Dumpling praktis untuk stok rumah.",
+            "tags": "dumpling frozen",
+            "image": "https://images.unsplash.com/photo-1547592180-85f173990554?auto=format&fit=crop&w=800&q=80"
+      },
+      {
+            "id": 34,
+            "name": "Nugget Ayam Crispy",
+            "category": "Frozen",
+            "price": 52000,
+            "promo": false,
+            "description": "Nugget favorit keluarga, gampang dimasak.",
+            "tags": "nugget ayam",
+            "image": "https://images.unsplash.com/photo-1514326640560-7d063ef2aed5?auto=format&fit=crop&w=800&q=80"
+      },
+      {
+            "id": 35,
+            "name": "Sosis Sapi Jumbo",
+            "category": "Frozen",
+            "price": 47000,
+            "promo": false,
+            "description": "Sosis tebal untuk bekal dan grill.",
+            "tags": "sosis sapi",
+            "image": "https://images.unsplash.com/photo-1529042410759-befb1204b468?auto=format&fit=crop&w=800&q=80"
+      },
+      {
+            "id": 36,
+            "name": "Fish Ball Premium",
+            "category": "Frozen",
+            "price": 39000,
+            "promo": false,
+            "description": "Bakso ikan lembut cocok buat sup.",
+            "tags": "fish ball",
+            "image": "https://images.unsplash.com/photo-1473093295043-cdd812d0e601?auto=format&fit=crop&w=800&q=80"
+      },
+      {
+            "id": 37,
+            "name": "Tempe Mendoan Frozen",
+            "category": "Frozen",
+            "price": 30000,
+            "promo": false,
+            "description": "Tempe siap goreng praktis.",
+            "tags": "tempe mendoan",
+            "image": "https://images.unsplash.com/photo-1512003867696-6d5ce6835040?auto=format&fit=crop&w=800&q=80"
+      },
+      {
+            "id": 38,
+            "name": "Siomay Ayam Frozen",
+            "category": "Frozen",
+            "price": 41000,
+            "promo": true,
+            "description": "Siomay siap kukus, hemat waktu.",
+            "tags": "siomay frozen",
+            "image": "https://images.unsplash.com/photo-1481931715705-36f0e5c8c4f6?auto=format&fit=crop&w=800&q=80"
+      },
+      {
+            "id": 39,
+            "name": "Chicken Karaage Frozen",
+            "category": "Frozen",
+            "price": 56000,
+            "promo": false,
+            "description": "Ayam karaage renyah ala resto.",
+            "tags": "karaage",
+            "image": "https://images.unsplash.com/photo-1553909489-cd47e0ef937f?auto=format&fit=crop&w=800&q=80"
+      },
+      {
+            "id": 40,
+            "name": "French Fries Frozen",
+            "category": "Frozen",
+            "price": 27000,
+            "promo": false,
+            "description": "Kentang goreng untuk camilan cepat.",
+            "tags": "french fries",
+            "image": "https://images.unsplash.com/photo-1514516345957-556ca7d90a5f?auto=format&fit=crop&w=800&q=80"
+      },
+      {
+            "id": 41,
+            "name": "Nasi Ayam Teriyaki",
+            "category": "Makanan Berat",
+            "price": 42000,
+            "promo": false,
+            "description": "Porsi lengkap dengan saus teriyaki.",
+            "tags": "nasi ayam",
+            "image": "https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?auto=format&fit=crop&w=800&q=80"
+      },
+      {
+            "id": 42,
+            "name": "Beef Bowl Spesial",
+            "category": "Makanan Berat",
+            "price": 59000,
+            "promo": true,
+            "description": "Daging sapi empuk dengan saus gurih.",
+            "tags": "beef bowl",
+            "image": "https://images.unsplash.com/photo-1513104890138-7c749659a591?auto=format&fit=crop&w=800&q=80"
+      },
+      {
+            "id": 43,
+            "name": "Mie Goreng Telur Puyuh",
+            "category": "Makanan Berat",
+            "price": 27000,
+            "promo": false,
+            "description": "Mie gurih dengan topping sederhana.",
+            "tags": "mie goreng",
+            "image": "https://images.unsplash.com/photo-1565299507177-b0ac66763828?auto=format&fit=crop&w=800&q=80"
+      },
+      {
+            "id": 44,
+            "name": "Sate Taichan Paket",
+            "category": "Makanan Berat",
+            "price": 43000,
+            "promo": true,
+            "description": "Sate pedas segar dengan sambal bawang.",
+            "tags": "sate taichan",
+            "image": "https://images.unsplash.com/photo-1504674900247-0877df9cc836?auto=format&fit=crop&w=800&q=80"
+      },
+      {
+            "id": 45,
+            "name": "Ayam Geprek Crispy",
+            "category": "Makanan Berat",
+            "price": 35000,
+            "promo": false,
+            "description": "Ayam crispy dengan sambal pedas.",
+            "tags": "ayam geprek",
+            "image": "https://images.unsplash.com/photo-1565299624946-b28f40a0ae38?auto=format&fit=crop&w=800&q=80"
+      },
+      {
+            "id": 46,
+            "name": "Rice Box Tuna Mayo",
+            "category": "Makanan Berat",
+            "price": 39000,
+            "promo": false,
+            "description": "Rice box praktis dengan tuna mayo.",
+            "tags": "rice box",
+            "image": "https://images.unsplash.com/photo-1547592180-85f173990554?auto=format&fit=crop&w=800&q=80"
+      },
+      {
+            "id": 47,
+            "name": "Nasi Padang Komplit",
+            "category": "Makanan Berat",
+            "price": 48000,
+            "promo": false,
+            "description": "Paket nasi padang dengan lauk lengkap.",
+            "tags": "nasi padang",
+            "image": "https://images.unsplash.com/photo-1453831362806-3c1f0f3f9e10?auto=format&fit=crop&w=800&q=80"
+      },
+      {
+            "id": 48,
+            "name": "Salad Chicken Bowl",
+            "category": "Makanan Berat",
+            "price": 46000,
+            "promo": true,
+            "description": "Salad segar dengan ayam panggang.",
+            "tags": "salad bowl",
+            "image": "https://images.unsplash.com/photo-1547592180-85f173990554?auto=format&fit=crop&w=800&q=80"
+      },
+      {
+            "id": 49,
+            "name": "Panna Cotta Vanilla",
+            "category": "Dessert",
+            "price": 34000,
+            "promo": false,
+            "description": "Dessert lembut dengan saus buah.",
+            "tags": "panna cotta",
+            "image": "https://images.unsplash.com/photo-1488477181946-6428a0291777?auto=format&fit=crop&w=800&q=80"
+      },
+      {
+            "id": 50,
+            "name": "Tiramisu Cup",
+            "category": "Dessert",
+            "price": 36000,
+            "promo": true,
+            "description": "Tiramisu creamy dalam cup praktis.",
+            "tags": "tiramisu",
+            "image": "https://images.unsplash.com/photo-1565958011703-44f9829ba187?auto=format&fit=crop&w=800&q=80"
+      }
+];
+
+    const state = {
+      search: "",
+      category: "all",
+      sort: "featured",
+      cart: loadCart()
+    };
+
+    const els = {
+      searchInput: document.getElementById("searchInput"),
+      productGrid: document.getElementById("productGrid"),
+      categoryChips: document.getElementById("categoryChips"),
+      sortSelect: document.getElementById("sortSelect"),
+      viewTitle: document.getElementById("viewTitle"),
+      resultInfo: document.getElementById("resultInfo"),
+      statProducts: document.getElementById("statProducts"),
+      statCategories: document.getElementById("statCategories"),
+      statCart: document.getElementById("statCart"),
+      cartBtn: document.getElementById("cartBtn"),
+      cartCount: document.getElementById("cartCount"),
+      cartDrawer: document.getElementById("cartDrawer"),
+      cartList: document.getElementById("cartList"),
+      cartMeta: document.getElementById("cartMeta"),
+      subtotal: document.getElementById("subtotal"),
+      shipping: document.getElementById("shipping"),
+      grandTotal: document.getElementById("grandTotal"),
+      overlay: document.getElementById("overlay"),
+      closeCart: document.getElementById("closeCart"),
+      continueShopping: document.getElementById("continueShopping"),
+      checkoutBtn: document.getElementById("checkoutBtn"),
+      checkoutModal: document.getElementById("checkoutModal"),
+      closeCheckout: document.getElementById("closeCheckout"),
+      confirmPayment: document.getElementById("confirmPayment"),
+      buyerName: document.getElementById("buyerName"),
+      phoneNumber: document.getElementById("phoneNumber"),
+      address: document.getElementById("address"),
+      delivery: document.getElementById("delivery"),
+      paymentMethod: document.getElementById("paymentMethod"),
+      modalSubtotal: document.getElementById("modalSubtotal"),
+      modalShipping: document.getElementById("modalShipping"),
+      modalTotal: document.getElementById("modalTotal"),
+      resetFilters: document.getElementById("resetFilters"),
+      clearStorage: document.getElementById("clearStorage"),
+      toast: document.getElementById("toast")
+    };
+
+    const categories = ["all", ...new Set(products.map(p => p.category))];
+
+    els.statProducts.textContent = String(products.length);
+    els.statCategories.textContent = String(categories.length - 1);
+
+    function normalizeText(value) {
+      return String(value || "")
+        .toLowerCase()
+        .normalize("NFD")
+        .replace(/[\u0300-\u036f]/g, "");
+    }
+
+    function rupiah(number) {
+      return "Rp " + Number(number || 0).toLocaleString("id-ID");
+    }
+
+    function toast(message) {
+      els.toast.textContent = message;
+      els.toast.classList.add("show");
+      clearTimeout(window.__toastTimer);
+      window.__toastTimer = setTimeout(() => els.toast.classList.remove("show"), 2200);
+    }
+
+    function saveCart() {
+      localStorage.setItem("gourmet-market-cart", JSON.stringify(state.cart));
+    }
+
+    function loadCart() {
+      try {
+        const raw = localStorage.getItem("gourmet-market-cart");
+        const parsed = raw ? JSON.parse(raw) : [];
+        return Array.isArray(parsed) ? parsed : [];
+      } catch {
+        return [];
+      }
+    }
+
+    function getProductById(id) {
+      return products.find(p => p.id === Number(id));
+    }
+
+    function shippingCost() {
+      const subtotal = getSubtotal();
+      if (subtotal === 0) return 0;
+      if (subtotal >= 200000) return 0;
+      const delivery = els.delivery?.value || "reguler";
+      if (delivery === "express") return 20000;
+      if (delivery === "pickup") return 0;
+      return 12000;
+    }
+
+    function getSubtotal() {
+      return state.cart.reduce((sum, item) => sum + item.price * item.quantity, 0);
+    }
+
+    function getTotalItems() {
+      return state.cart.reduce((sum, item) => sum + item.quantity, 0);
+    }
+
+    function getFilteredProducts() {
+      const q = normalizeText(state.search);
+      let list = products.filter(p => {
+        const matchCategory = state.category === "all" || p.category === state.category;
+        const haystack = normalizeText([p.name, p.category, p.description, p.tags].join(" "));
+        const matchSearch = !q || haystack.includes(q);
+        return matchCategory && matchSearch;
+      });
+
+      switch (state.sort) {
+        case "low-high":
+          list.sort((a, b) => a.price - b.price);
+          break;
+        case "high-low":
+          list.sort((a, b) => b.price - a.price);
+          break;
+        case "name-az":
+          list.sort((a, b) => a.name.localeCompare(b.name, "id"));
+          break;
+        default:
+          list.sort((a, b) => Number(b.promo) - Number(a.promo) || a.name.localeCompare(b.name, "id"));
+      }
+
+      return list;
+    }
+
+    function renderCategories() {
+      els.categoryChips.innerHTML = categories.map(cat => {
+        const label = cat === "all" ? "Semua" : cat;
+        return `<button class="chip ${state.category === cat ? "active" : ""}" data-cat="${cat}">${label}</button>`;
+      }).join("");
+
+      els.categoryChips.querySelectorAll(".chip").forEach(btn => {
+        btn.addEventListener("click", () => {
+          state.category = btn.dataset.cat;
+          renderAll();
+        });
+      });
+    }
+
+    function renderProducts() {
+      const list = getFilteredProducts();
+      els.viewTitle.textContent = state.category === "all" ? "Semua Produk" : state.category;
+      els.resultInfo.textContent = `${list.length} produk ditemukan`;
+
+      if (!list.length) {
+        els.productGrid.innerHTML = `
+          <div class="empty">
+            <h3 style="margin:0 0 8px;">Produk tidak ditemukan</h3>
+            <div>Coba ubah kata kunci pencarian atau filter kategori.</div>
+          </div>`;
+        return;
+      }
+
+      els.productGrid.innerHTML = list.map(product => `
+        <article class="product-card">
+          ${product.promo ? '<span class="badge">Best Seller</span>' : ''}
+          <img class="product-image" src="${product.image}" alt="${product.name}" loading="lazy">
+          <div class="product-body">
+            <div class="category">${product.category}</div>
+            <h3 class="name">${product.name}</h3>
+            <p class="desc">${product.description}</p>
+            <div class="price-row">
+              <div class="price">${rupiah(product.price)}</div>
+              <button class="btn btn-primary" data-add="${product.id}">
+                <i class="fa-solid fa-cart-plus"></i> Tambah
+              </button>
+            </div>
+          </div>
+        </article>
+      `).join("");
+
+      els.productGrid.querySelectorAll("[data-add]").forEach(btn => {
+        btn.addEventListener("click", () => addToCart(Number(btn.dataset.add)));
+      });
+    }
+
+    function renderCart() {
+      const totalItems = getTotalItems();
+      const subtotal = getSubtotal();
+      const ship = shippingCost();
+      const total = subtotal + ship;
+
+      els.cartCount.textContent = String(totalItems);
+      els.statCart.textContent = String(totalItems);
+      els.cartMeta.textContent = `${totalItems} item`;
+
+      els.subtotal.textContent = rupiah(subtotal);
+      els.shipping.textContent = rupiah(ship);
+      els.grandTotal.textContent = rupiah(total);
+      els.modalSubtotal.textContent = rupiah(subtotal);
+      els.modalShipping.textContent = rupiah(ship);
+      els.modalTotal.textContent = rupiah(total);
+
+      if (!state.cart.length) {
+        els.cartList.innerHTML = `
+          <div class="empty" style="margin-top: 6px;">
+            <h3 style="margin:0 0 8px;">Keranjang kosong</h3>
+            <div>Isi dulu. Keranjang tidak akan terisi sendiri oleh takdir.</div>
+          </div>`;
+        saveCart();
+        return;
+      }
+
+      els.cartList.innerHTML = state.cart.map(item => `
+        <div class="cart-item">
+          <img src="${item.image}" alt="${item.name}">
+          <div>
+            <h4>${item.name}</h4>
+            <div class="sub">${rupiah(item.price)} × ${item.quantity}</div>
+            <div class="qty">
+              <div class="qty-control">
+                <button class="qty-btn" data-dec="${item.id}">-</button>
+                <strong>${item.quantity}</strong>
+                <button class="qty-btn" data-inc="${item.id}">+</button>
+              </div>
+              <button class="btn btn-danger small" data-remove="${item.id}"><i class="fa-solid fa-trash"></i></button>
+            </div>
+          </div>
+        </div>
+      `).join("");
+
+      els.cartList.querySelectorAll("[data-inc]").forEach(btn => {
+        btn.addEventListener("click", () => changeQty(Number(btn.dataset.inc), 1));
+      });
+      els.cartList.querySelectorAll("[data-dec]").forEach(btn => {
+        btn.addEventListener("click", () => changeQty(Number(btn.dataset.dec), -1));
+      });
+      els.cartList.querySelectorAll("[data-remove]").forEach(btn => {
+        btn.addEventListener("click", () => removeFromCart(Number(btn.dataset.remove)));
+      });
+
+      saveCart();
+    }
+
+    function renderAll() {
+      renderCategories();
+      renderProducts();
+      renderCart();
+    }
+
+    function addToCart(id) {
+      const product = getProductById(id);
+      if (!product) return;
+      const existing = state.cart.find(item => item.id === product.id);
+      if (existing) {
+        existing.quantity += 1;
+      } else {
+        state.cart.push({ ...product, quantity: 1 });
+      }
+      renderCart();
+      toast(`${product.name} ditambahkan ke keranjang`);
+      openCart();
+    }
+
+    function changeQty(id, delta) {
+      const item = state.cart.find(item => item.id === id);
+      if (!item) return;
+      item.quantity += delta;
+      if (item.quantity <= 0) {
+        state.cart = state.cart.filter(item => item.id !== id);
+      }
+      renderCart();
+    }
+
+    function removeFromCart(id) {
+      state.cart = state.cart.filter(item => item.id !== id);
+      renderCart();
+      toast("Item dihapus dari keranjang");
+    }
+
+    function openCart() {
+      els.cartDrawer.classList.add("open");
+      els.overlay.classList.add("show");
+    }
+
+    function closeCart() {
+      els.cartDrawer.classList.remove("open");
+      els.overlay.classList.remove("show");
+    }
+
+    function openCheckout() {
+      if (!state.cart.length) {
+        toast("Keranjang masih kosong");
+        return;
+      }
+      updateCheckoutSummary();
+      els.checkoutModal.classList.add("show");
+    }
+
+    function closeCheckout() {
+      els.checkoutModal.classList.remove("show");
+    }
+
+    function updateCheckoutSummary() {
+      const ship = shippingCost();
+      const subtotal = getSubtotal();
+      els.modalSubtotal.textContent = rupiah(subtotal);
+      els.modalShipping.textContent = rupiah(ship);
+      els.modalTotal.textContent = rupiah(subtotal + ship);
+    }
+
+    function validateCheckout() {
+      const name = els.buyerName.value.trim();
+      const phone = els.phoneNumber.value.trim();
+      const address = els.address.value.trim();
+      if (name.length < 3) return "Nama penerima belum benar";
+      if (phone.length < 8) return "Nomor HP belum benar";
+      if (els.delivery.value !== "pickup" && address.length < 10) return "Alamat pengiriman belum lengkap";
+      return null;
+    }
+
+    // events
+    let searchTimer = null;
+    els.searchInput.addEventListener("input", e => {
+      clearTimeout(searchTimer);
+      searchTimer = setTimeout(() => {
+        state.search = e.target.value;
+        renderProducts();
+      }, 120);
+    });
+
+    els.sortSelect.addEventListener("change", e => {
+      state.sort = e.target.value;
+      renderProducts();
+    });
+
+    els.resetFilters.addEventListener("click", () => {
+      state.search = "";
+      state.category = "all";
+      state.sort = "featured";
+      els.searchInput.value = "";
+      els.sortSelect.value = "featured";
+      renderAll();
+      toast("Filter direset");
+    });
+
+    els.clearStorage.addEventListener("click", () => {
+      state.cart = [];
+      saveCart();
+      renderCart();
+      toast("Keranjang disimpan dihapus");
+    });
+
+    els.cartBtn.addEventListener("click", openCart);
+    els.closeCart.addEventListener("click", closeCart);
+    els.continueShopping.addEventListener("click", closeCart);
+    els.overlay.addEventListener("click", closeCart);
+
+    els.checkoutBtn.addEventListener("click", () => {
+      updateCheckoutSummary();
+      closeCart();
+      openCheckout();
+    });
+
+    els.closeCheckout.addEventListener("click", closeCheckout);
+    els.checkoutModal.addEventListener("click", (e) => {
+      if (e.target === els.checkoutModal) closeCheckout();
+    });
+
+    els.delivery.addEventListener("change", updateCheckoutSummary);
+
+    els.confirmPayment.addEventListener("click", () => {
+      const error = validateCheckout();
+      if (error) {
+        toast(error);
+        return;
+      }
+      const total = getSubtotal() + shippingCost();
+      const orderId = "GM-" + Date.now().toString().slice(-8);
+      alert(`Pembayaran berhasil.\n\nOrder ID: ${orderId}\nTotal: ${rupiah(total)}\nMetode: ${els.paymentMethod.options[els.paymentMethod.selectedIndex].text}\n\nPesanan diproses.`);
+      state.cart = [];
+      saveCart();
+      renderCart();
+      closeCheckout();
+      els.buyerName.value = "";
+      els.phoneNumber.value = "";
+      els.address.value = "";
+      els.delivery.value = "reguler";
+      els.paymentMethod.value = "transfer";
+    });
+
+    document.addEventListener("keydown", (e) => {
+      if (e.key === "Escape") {
+        closeCart();
+        closeCheckout();
+      }
+    });
+
+    // initial render
+    renderAll();
+  </script>
+
+<script>
+const USERS={
+'Arik':'0240547',
+'Gifar':'02405011'
+};
+
+function loginSystem(){
+ const u=document.getElementById('loginUser').value.trim();
+ const p=document.getElementById('loginPass').value.trim();
+ const err=document.getElementById('loginError');
+ if(USERS[u] && USERS[u]===p){
+   localStorage.setItem('gm_logged_user',u);
+   document.getElementById('loginScreen').style.display='none';
+   toast('Login berhasil. Selamat datang '+u);
+ }else{
+   err.textContent='Username atau password salah';
+ }
+}
+
+window.addEventListener('load',()=>{
+ const user=localStorage.getItem('gm_logged_user');
+ if(user && USERS[user]){
+   document.getElementById('loginScreen').style.display='none';
+ }
+});
+</script>
+</body>
+</html>
